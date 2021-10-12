@@ -3,11 +3,12 @@ import fs from "fs-extra";
 import path from "path";
 import shell from "shelljs";
 import * as adoService from "./ado-service";
+import * as storageService from "./storage-service";
 
 export async function code() {
   const projects = await adoService.getProjects();
 
-  const results = await inquirer.prompt([
+  const { project } = await inquirer.prompt([
     {
       name: "project",
       message: `Select project`,
@@ -21,10 +22,9 @@ export async function code() {
     },
   ]);
 
-  const { project } = results;
   const repos = await adoService.getRepos(project.id);
 
-  const repoResults = await inquirer.prompt([
+  const { repo } = await inquirer.prompt([
     {
       name: "repo",
       message: `Select repo`,
@@ -38,9 +38,19 @@ export async function code() {
     },
   ]);
 
-  const { repo } = repoResults;
+  if (!storageService.get().codePath) {
+    const { newCodePath } = await inquirer.prompt([
+      {
+        name: "newCodePath",
+        message: `What base path would you like to use to store your code`,
+        type: "input",
+      },
+    ]);
+    storageService.set({ codePath: newCodePath });
+  }
 
-  const projectLocation = path.resolve(`c:/code/${project.name.toLowerCase()}`);
+  const { codePath } = storageService.get();
+  const projectLocation = path.resolve(codePath, project.name.toLowerCase());
 
   fs.mkdirp(projectLocation).catch(() => {});
 

@@ -1,6 +1,5 @@
 import axios from "axios";
-import fs from "fs-extra";
-import path from "path";
+import * as storageService from "./storage-service";
 
 const client = axios.create({
   baseURL: "https://dev.azure.com/danfoss",
@@ -24,19 +23,15 @@ client.interceptors.response.use(
   }
 );
 
-const persistantStorageLocation = path.resolve(__dirname, "../data");
-const tokenLocation = path.resolve(persistantStorageLocation, "token.txt");
-
-fs.mkdirp(persistantStorageLocation);
-
 export function storeToken(token: string) {
-  fs.writeFileSync(tokenLocation, token);
+  storageService.set({
+    pat: token,
+  });
 }
 
 export function getToken() {
-  if (fs.existsSync(tokenLocation)) {
-    return fs.readFileSync(tokenLocation, "utf-8");
-  }
+  const { pat } = storageService.get();
+  return pat;
 }
 
 export async function getProjects(): Promise<any[]> {
@@ -57,5 +52,4 @@ export async function getRepos(projectId: string): Promise<any[]> {
     a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
   );
   return repos;
-  //   return [];
 }
