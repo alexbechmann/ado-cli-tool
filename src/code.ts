@@ -29,10 +29,10 @@ export async function code() {
       name: "repo",
       message: `Select repo`,
       type: "list",
-      choices: repos.map((project) => {
+      choices: repos.map((repo) => {
         return {
-          value: project,
-          name: project.name,
+          value: repo,
+          name: repo.name,
         };
       }),
     },
