@@ -1,13 +1,20 @@
 import axios from "axios";
 import * as storageService from "./storage-service";
+import keytar from "keytar";
 
 const client = axios.create({
-  baseURL: "https://dev.azure.com/danfoss",
+  baseURL: `https://dev.azure.com/${
+    storageService.get().azureDevopsOrganization
+  }`,
   headers: {},
 });
 
+console.log(
+  `https://dev.azure.com/${storageService.get().azureDevopsOrganization}`
+);
+
 client.interceptors.request.use(async (requestConfig) => {
-  const pat = getToken();
+  const pat = await getToken();
   const patBase64 = Buffer.from(`:${pat}`).toString("base64");
   requestConfig.headers["Authorization"] = `Basic ${patBase64}`;
   return requestConfig;
@@ -23,15 +30,12 @@ client.interceptors.response.use(
   }
 );
 
-export function storeToken(token: string) {
-  storageService.set({
-    pat: token,
-  });
+export async function storeToken(token: string) {
+  await keytar.setPassword("ado-cli-tool", "default", token);
 }
 
 export function getToken() {
-  const { pat } = storageService.get();
-  return pat;
+  return keytar.getPassword("ado-cli-tool", "default");
 }
 
 export async function getProjects(): Promise<any[]> {

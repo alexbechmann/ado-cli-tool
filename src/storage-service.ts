@@ -12,8 +12,8 @@ if (!fs.existsSync(jsonDatabaseLocation)) {
 }
 
 export interface StorageData {
-  pat?: string;
   codePath?: string;
+  azureDevopsOrganization?: string;
 }
 
 export function get(): StorageData {

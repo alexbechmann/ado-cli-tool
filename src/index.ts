@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { code } from "./code";
 import { login } from "./login";
+import { getToken } from "./ado-service";
 
 const program = new Command();
 
@@ -11,8 +12,14 @@ program.command("code").action(() => {
 program
   .command("login")
   .option("-p, --pat <pat>", "PAT token")
-  .action(({ pat }) => {
-    login(pat);
+  .option("-o, --org <org>", "Azure Devops organization")
+  .action(({ pat, org }) => {
+    login({ pat, org });
   });
+
+program.command("get-token").action(async () => {
+  const token = await getToken();
+  console.log(token);
+});
 
 program.parse(process.argv);
