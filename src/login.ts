@@ -22,8 +22,8 @@ export async function login({ pat, org }: { pat?: string; org: string }) {
       {
         name: "patToken",
         message: `What is your PAT token?`,
-        type: "input",
-        default: adoService.getToken(),
+        type: "password",
+        default: await adoService.getToken(),
       },
     ]);
 
