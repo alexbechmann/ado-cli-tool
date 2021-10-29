@@ -29,7 +29,7 @@ export async function getProjects() {
   );
 }
 
-export async function getRepos(projectId: string): Promise<any[]> {
+export async function getRepos(projectId: string) {
   console.log(`Getting repos...`);
   const connection = await createConnection();
   const git = await connection.getGitApi();
