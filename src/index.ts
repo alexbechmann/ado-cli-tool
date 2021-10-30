@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { Command } from "commander";
 import { CodeHandler } from "./handlers/code-handler";
 import { LoginHandler } from "./handlers/login-handler";

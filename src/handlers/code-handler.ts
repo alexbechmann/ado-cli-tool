@@ -3,8 +3,8 @@ import fs from "fs-extra";
 import path from "path";
 import shell from "shelljs";
 import { injectable } from "tsyringe";
-import { AzureDevopsService } from "src/common/azure-devops-service";
-import { StorageService } from "src/common/storage-service";
+import { AzureDevopsService } from "../common/azure-devops-service";
+import { StorageService } from "../common/storage-service";
 
 @injectable()
 export class CodeHandler {

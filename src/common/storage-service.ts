@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import { injectable } from "tsyringe";
 
-const persistantStorageLocation = path.resolve(__dirname, "../data");
+const persistantStorageLocation = path.resolve(__dirname, "../../data");
 const jsonDatabaseLocation = path.resolve(persistantStorageLocation, "db.json");
 
 export interface StorageData {
@@ -14,7 +14,6 @@ export interface StorageData {
 export class StorageService {
   constructor() {
     fs.mkdirp(persistantStorageLocation);
-
     if (!fs.existsSync(jsonDatabaseLocation)) {
       const initialData: StorageData = {};
       this.set(initialData);

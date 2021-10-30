@@ -1,5 +1,5 @@
-import { AzureDevopsService } from "src/common/azure-devops-service";
-import { StorageService } from "src/common/storage-service";
+import { AzureDevopsService } from "../common/azure-devops-service";
+import { StorageService } from "../common/storage-service";
 import { container, injectable } from "tsyringe";
 
 @injectable()

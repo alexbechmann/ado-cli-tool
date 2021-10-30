@@ -1,6 +1,6 @@
 import inquirer from "inquirer";
-import { AzureDevopsService } from "src/common/azure-devops-service";
-import { StorageService } from "src/common/storage-service";
+import { AzureDevopsService } from "../common/azure-devops-service";
+import { StorageService } from "../common/storage-service";
 import { injectable } from "tsyringe";
 
 @injectable()

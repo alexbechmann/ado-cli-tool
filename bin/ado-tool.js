@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-require("esbuild-register");
+require("../babel-register");
 
 require("../src");
