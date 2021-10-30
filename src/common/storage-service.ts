@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import { injectable } from "tsyringe";
 
 const persistantStorageLocation = path.resolve(__dirname, "../data");
 const jsonDatabaseLocation = path.resolve(persistantStorageLocation, "db.json");
@@ -15,6 +16,9 @@ export interface StorageData {
   codePath?: string;
   azureDevopsOrganization?: string;
 }
+
+@injectable()
+export class StorageService {}
 
 export function get(): StorageData {
   if (fs.existsSync(jsonDatabaseLocation)) {
