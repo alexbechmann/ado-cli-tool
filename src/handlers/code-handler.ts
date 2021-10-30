@@ -5,6 +5,8 @@ import shell from "shelljs";
 import { injectable } from "tsyringe";
 import { AzureDevopsService } from "../common/azure-devops-service";
 import { StorageService } from "../common/storage-service";
+import { GitRepository } from "azure-devops-node-api/interfaces/TfvcInterfaces";
+import { TeamProjectReference } from "azure-devops-node-api/interfaces/CoreInterfaces";
 
 @injectable()
 export class CodeHandler {
@@ -16,7 +18,7 @@ export class CodeHandler {
   async code() {
     const projects = await this.azureDevopsService.getProjects();
 
-    const { project } = await inquirer.prompt([
+    const projectResponse = await inquirer.prompt([
       {
         name: "project",
         message: `Select project`,
@@ -30,9 +32,11 @@ export class CodeHandler {
       },
     ]);
 
+    const project: TeamProjectReference = projectResponse.project;
+
     const repos = await this.azureDevopsService.getRepos(project.id);
 
-    const { repo } = await inquirer.prompt([
+    const repoResponse = await inquirer.prompt([
       {
         name: "repo",
         message: `Select repo`,
@@ -45,6 +49,8 @@ export class CodeHandler {
         }),
       },
     ]);
+
+    const repo: GitRepository = repoResponse.repo;
 
     if (!this.storageService.get().codePath) {
       const { newCodePath } = await inquirer.prompt([
