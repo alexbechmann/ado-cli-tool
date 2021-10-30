@@ -1,13 +1,14 @@
 import { Command } from "commander";
-import { code } from "./code";
-import { login } from "./login";
-import { getToken } from "./ado-service";
-import * as storageService from "./storage-service";
+import { CodeHandler } from "./handlers/code-handler";
+import { LoginHandler } from "./handlers/login-handler";
+import { GetTokenHandler } from "./handlers/get-token-handler";
+import { container } from "tsyringe";
 
 const program = new Command();
 
 program.command("code").action(() => {
-  code();
+  const codeHandler = container.resolve(CodeHandler);
+  codeHandler.code();
 });
 
 program
@@ -15,19 +16,16 @@ program
   .option("-p, --pat <pat>", "PAT token")
   .option("-o, --org <org>", "Azure Devops organization")
   .action(({ pat, org }) => {
-    login({ pat, org });
+    const loginHandler = container.resolve(LoginHandler);
+    loginHandler.login({ pat, org });
   });
 
 program
   .command("get-token")
   .option("-o, --org <org>", "Azure Devops organization")
   .action(async ({ org }) => {
-    if (!org) {
-      const { azureDevopsOrganization } = storageService.get();
-      org = azureDevopsOrganization;
-    }
-    const token = await getToken({ org });
-    console.log(token);
+    const getTokenHandler = container.resolve(GetTokenHandler);
+    getTokenHandler.logToken({ org });
   });
 
 program.parse(process.argv);
