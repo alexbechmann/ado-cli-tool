@@ -7,7 +7,6 @@ import { AzureDevopsService } from "../common/azure-devops-service";
 import { StorageService } from "../common/storage-service";
 import { GitRepository } from "azure-devops-node-api/interfaces/TfvcInterfaces";
 import { TeamProjectReference } from "azure-devops-node-api/interfaces/CoreInterfaces";
-import kababCase from "just-kebab-case";
 import kebabCase from "just-kebab-case";
 
 @injectable()
