@@ -3,20 +3,26 @@ import keytar from "keytar";
 import * as azdev from "azure-devops-node-api";
 
 async function createConnection() {
-  const pat = await getToken();
-  const authHandler = azdev.getPersonalAccessTokenHandler(pat);
   const { azureDevopsOrganization } = storageService.get();
+  const pat = await getToken({ org: azureDevopsOrganization });
+  const authHandler = azdev.getPersonalAccessTokenHandler(pat);
   const orgUrl = `https://dev.azure.com/${azureDevopsOrganization}`;
   const connection = new azdev.WebApi(orgUrl, authHandler);
   return connection;
 }
 
-export async function storeToken(token: string) {
-  await keytar.setPassword("ado-cli-tool", "default", token);
+export async function storeToken({
+  org,
+  token,
+}: {
+  org: string;
+  token: string;
+}) {
+  await keytar.setPassword("ado-cli-tool", org, token);
 }
 
-export function getToken() {
-  return keytar.getPassword("ado-cli-tool", "default");
+export function getToken({ org }: { org: string }) {
+  return keytar.getPassword("ado-cli-tool", org);
 }
 
 export async function getProjects() {

@@ -49,8 +49,12 @@ export async function code() {
     storageService.set({ codePath: newCodePath });
   }
 
-  const { codePath } = storageService.get();
-  const projectLocation = path.resolve(codePath, project.name.toLowerCase());
+  const { codePath, azureDevopsOrganization } = storageService.get();
+  const projectLocation = path.resolve(
+    codePath,
+    azureDevopsOrganization.toLowerCase(),
+    project.name.toLowerCase()
+  );
 
   fs.mkdirp(projectLocation).catch(() => {});
 

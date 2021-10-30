@@ -3,13 +3,14 @@ import * as adoService from "./ado-service";
 import * as storageService from "./storage-service";
 
 export async function login({ pat, org }: { pat?: string; org: string }) {
+  const { azureDevopsOrganization } = storageService.get();
   if (!org) {
     const { orgName } = await inquirer.prompt([
       {
         name: "orgName",
         message: `What is your Azure Devops organization name?`,
         type: "input",
-        default: storageService.get().azureDevopsOrganization,
+        default: azureDevopsOrganization,
       },
     ]);
     org = orgName;
@@ -23,11 +24,11 @@ export async function login({ pat, org }: { pat?: string; org: string }) {
         name: "patToken",
         message: `What is your PAT token?`,
         type: "password",
-        default: await adoService.getToken(),
+        default: await adoService.getToken({ org }),
       },
     ]);
 
     pat = patToken;
   }
-  adoService.storeToken(pat);
+  adoService.storeToken({ org, token: pat });
 }
