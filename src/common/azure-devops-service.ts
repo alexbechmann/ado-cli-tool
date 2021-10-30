@@ -1,11 +1,13 @@
-import * as storageService from "./storage-service";
 import keytar from "keytar";
 import * as azdev from "azure-devops-node-api";
+import { injectable } from "tsyringe";
+import { StorageService } from "./storage-service";
 
 @injectable()
 export class AzureDevopsService {
+  constructor(private storageService: StorageService) {}
   async createConnection() {
-    const { azureDevopsOrganization } = storageService.get();
+    const { azureDevopsOrganization } = this.storageService.get();
     const pat = await this.getToken({ org: azureDevopsOrganization });
     const authHandler = azdev.getPersonalAccessTokenHandler(pat);
     const orgUrl = `https://dev.azure.com/${azureDevopsOrganization}`;

@@ -5,32 +5,34 @@ import { injectable } from "tsyringe";
 const persistantStorageLocation = path.resolve(__dirname, "../data");
 const jsonDatabaseLocation = path.resolve(persistantStorageLocation, "db.json");
 
-fs.mkdirp(persistantStorageLocation);
-
-if (!fs.existsSync(jsonDatabaseLocation)) {
-  const initialData: StorageData = {};
-  set(initialData);
-}
-
 export interface StorageData {
   codePath?: string;
   azureDevopsOrganization?: string;
 }
 
 @injectable()
-export class StorageService {}
+export class StorageService {
+  constructor() {
+    fs.mkdirp(persistantStorageLocation);
 
-export function get(): StorageData {
-  if (fs.existsSync(jsonDatabaseLocation)) {
-    return fs.readJsonSync(jsonDatabaseLocation);
+    if (!fs.existsSync(jsonDatabaseLocation)) {
+      const initialData: StorageData = {};
+      this.set(initialData);
+    }
   }
-}
 
-export function set(data: Partial<StorageData>) {
-  const currentData = get();
-  const newData: StorageData = {
-    ...currentData,
-    ...data,
-  };
-  fs.writeJsonSync(jsonDatabaseLocation, newData);
+  get(): StorageData {
+    if (fs.existsSync(jsonDatabaseLocation)) {
+      return fs.readJsonSync(jsonDatabaseLocation);
+    }
+  }
+
+  set(data: Partial<StorageData>) {
+    const currentData = this.get();
+    const newData: StorageData = {
+      ...currentData,
+      ...data,
+    };
+    fs.writeJsonSync(jsonDatabaseLocation, newData);
+  }
 }
