@@ -7,6 +7,8 @@ import { AzureDevopsService } from "../common/azure-devops-service";
 import { StorageService } from "../common/storage-service";
 import { GitRepository } from "azure-devops-node-api/interfaces/TfvcInterfaces";
 import { TeamProjectReference } from "azure-devops-node-api/interfaces/CoreInterfaces";
+import kababCase from "just-kebab-case";
+import kebabCase from "just-kebab-case";
 
 @injectable()
 export class CodeHandler {
@@ -66,13 +68,13 @@ export class CodeHandler {
     const { codePath, azureDevopsOrganization } = this.storageService.get();
     const projectLocation = path.resolve(
       codePath,
-      azureDevopsOrganization.toLowerCase(),
-      project.name.toLowerCase()
+      kebabCase(azureDevopsOrganization),
+      kebabCase(project.name)
     );
 
     fs.mkdirp(projectLocation).catch(() => {});
 
-    const repoLocation = path.resolve(projectLocation, repo.name.toLowerCase());
+    const repoLocation = path.resolve(projectLocation, kebabCase(repo.name));
 
     if (fs.existsSync(repoLocation)) {
     } else {
