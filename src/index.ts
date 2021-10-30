@@ -4,7 +4,6 @@ import { CodeHandler } from "./handlers/code-handler";
 import { LoginHandler } from "./handlers/login-handler";
 import { GetTokenHandler } from "./handlers/get-token-handler";
 import { container } from "tsyringe";
-import { StorageService } from "./common/storage-service";
 
 const program = new Command();
 
