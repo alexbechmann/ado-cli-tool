@@ -9,5 +9,6 @@ const babelConfig = JSON.parse(
 require("@babel/register")({
   cache: false,
   extensions: [".ts", ".tsx"],
+  cwd: path.resolve(__dirname),
   ...babelConfig,
 });
