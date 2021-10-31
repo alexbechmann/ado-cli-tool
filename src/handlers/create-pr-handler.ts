@@ -67,7 +67,6 @@ export class CreatePRHandler {
     });
 
     console.log(chalk.green(`PR created`));
-    console.log(JSON.stringify(pr));
     const prUrl = `https://dev.azure.com/${org}/${projectName}/_git/${repoName}/pullrequest/${pr.pullRequestId}`;
     open(prUrl);
   }
