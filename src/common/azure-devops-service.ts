@@ -42,4 +42,38 @@ export class AzureDevopsService {
       a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
     );
   }
+
+  async getRepository({
+    projectName,
+    repositoryName,
+  }: {
+    repositoryName: string;
+    projectName: string;
+  }) {
+    const connection = await this.createConnection();
+    const git = await connection.getGitApi();
+    return git.getRepository(
+      decodeURIComponent(repositoryName),
+      decodeURIComponent(projectName)
+    );
+  }
+
+  async createPullRequest({
+    sourceBranch,
+    targetBranch,
+  }: {
+    sourceBranch: string;
+    targetBranch: string;
+  }) {
+    const connection = await this.createConnection();
+    const git = await connection.getGitApi();
+    const repositoryId = "";
+    await git.createPullRequest(
+      {
+        sourceRefName: sourceBranch,
+        targetRefName: targetBranch,
+      },
+      repositoryId
+    );
+  }
 }

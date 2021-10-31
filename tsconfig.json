@@ -12,9 +12,9 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "preserveSymlinks": true,
-    "rootDir": "./",
+    // "rootDir": "./",
     "declaration": true,
-    "baseUrl": "./",
+    // "baseUrl": "./",
     "experimentalDecorators": true
   },
   "exclude": ["**/pkg/**", "check-version.ts", "**/node_modules/**"]
