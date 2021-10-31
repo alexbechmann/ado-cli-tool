@@ -1,9 +1,9 @@
-import fs from "fs-extra";
-import path from "path";
-import { injectable } from "tsyringe";
+import fs from 'fs-extra';
+import path from 'path';
+import { injectable } from 'tsyringe';
 
-const persistantStorageLocation = path.resolve(__dirname, "../../data");
-const jsonDatabaseLocation = path.resolve(persistantStorageLocation, "db.json");
+const persistantStorageLocation = path.resolve(__dirname, '../../data');
+const jsonDatabaseLocation = path.resolve(persistantStorageLocation, 'db.json');
 
 export interface StorageData {
   codePath?: string;
@@ -30,7 +30,7 @@ export class StorageService {
     const currentData = this.get();
     const newData: StorageData = {
       ...currentData,
-      ...data,
+      ...data
     };
     fs.writeJsonSync(jsonDatabaseLocation, newData);
   }

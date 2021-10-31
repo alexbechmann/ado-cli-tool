@@ -36,6 +36,7 @@
     "inquirer": "^8.2.0",
     "just-kebab-case": "^3.0.0",
     "keytar": "^7.7.0",
+    "open": "^8.4.0",
     "parse-git-config": "^3.0.0",
     "reflect-metadata": "^0.1.13",
     "shelljs": "^0.8.4",

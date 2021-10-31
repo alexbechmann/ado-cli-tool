@@ -1,54 +1,53 @@
-import inquirer from "inquirer";
-import fs from "fs-extra";
-import path from "path";
-import shell from "shelljs";
-import { injectable } from "tsyringe";
-import { AzureDevopsService } from "../common/azure-devops-service";
-import { StorageService } from "../common/storage-service";
-import { GitRepository } from "azure-devops-node-api/interfaces/TfvcInterfaces";
-import { TeamProjectReference } from "azure-devops-node-api/interfaces/CoreInterfaces";
-import kebabCase from "just-kebab-case";
+import inquirer from 'inquirer';
+import fs from 'fs-extra';
+import path from 'path';
+import shell from 'shelljs';
+import { injectable } from 'tsyringe';
+import { AzureDevopsService } from '../common/azure-devops-service';
+import { StorageService } from '../common/storage-service';
+import { GitRepository } from 'azure-devops-node-api/interfaces/TfvcInterfaces';
+import { TeamProjectReference } from 'azure-devops-node-api/interfaces/CoreInterfaces';
+import kebabCase from 'just-kebab-case';
 
 @injectable()
 export class CodeHandler {
-  constructor(
-    private azureDevopsService: AzureDevopsService,
-    private storageService: StorageService
-  ) {}
+  constructor(private azureDevopsService: AzureDevopsService, private storageService: StorageService) {}
 
   async code() {
+    console.log(`Getting projects...`);
     const projects = await this.azureDevopsService.getProjects();
 
     const projectResponse = await inquirer.prompt([
       {
-        name: "project",
+        name: 'project',
         message: `Select project`,
-        type: "list",
+        type: 'list',
         choices: projects.map((project) => {
           return {
             value: project,
-            name: project.name,
+            name: project.name
           };
-        }),
-      },
+        })
+      }
     ]);
 
     const project: TeamProjectReference = projectResponse.project;
 
+    console.log(`Getting repos...`);
     const repos = await this.azureDevopsService.getRepos(project.id);
 
     const repoResponse = await inquirer.prompt([
       {
-        name: "repo",
+        name: 'repo',
         message: `Select repo`,
-        type: "list",
+        type: 'list',
         choices: repos.map((repo) => {
           return {
             value: repo,
-            name: repo.name,
+            name: repo.name
           };
-        }),
-      },
+        })
+      }
     ]);
 
     const repo: GitRepository = repoResponse.repo;
@@ -56,20 +55,17 @@ export class CodeHandler {
     if (!this.storageService.get().codePath) {
       const { newCodePath } = await inquirer.prompt([
         {
-          name: "newCodePath",
+          name: 'newCodePath',
           message: `What base path would you like to use to store your code`,
-          type: "input",
-        },
+          type: 'input'
+          // default: this.storageService.get().codePath
+        }
       ]);
       this.storageService.set({ codePath: newCodePath });
     }
 
     const { codePath, azureDevopsOrganization } = this.storageService.get();
-    const projectLocation = path.resolve(
-      codePath,
-      kebabCase(azureDevopsOrganization),
-      kebabCase(project.name)
-    );
+    const projectLocation = path.resolve(codePath, kebabCase(azureDevopsOrganization), kebabCase(project.name));
 
     fs.mkdirp(projectLocation).catch(() => {});
 
@@ -77,9 +73,7 @@ export class CodeHandler {
 
     if (fs.existsSync(repoLocation)) {
     } else {
-      console.log(
-        `Cloning using repo: ${repo.name} on project ${project.name} at location: ${projectLocation}`
-      );
+      console.log(`Cloning using repo: ${repo.name} on project ${project.name} at location: ${projectLocation}`);
 
       shell.cd(projectLocation);
       shell.exec(`git clone ${repo.remoteUrl} ${repo.name.toLowerCase()}`);
