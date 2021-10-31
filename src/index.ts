@@ -4,6 +4,8 @@ import { LoginHandler } from './handlers/login-handler';
 import { GetTokenHandler } from './handlers/get-token-handler';
 import { container } from 'tsyringe';
 import { CreatePRHandler } from './handlers/create-pr-handler';
+import { AzureDevopsService } from './common/azure-devops-service';
+import chalk from 'chalk';
 
 const program = new Command();
 
@@ -37,6 +39,28 @@ program
   .action(async ({ sourceBranch, targetBranch, title }) => {
     const createPRHandler = container.resolve(CreatePRHandler);
     createPRHandler.createPR({ sourceBranch, targetBranch, title });
+  });
+
+program
+  .command('build')
+  .requiredOption('-b, --branch <branch>', 'Branch')
+  .requiredOption('-p, --project <project>', 'Project definition name or id')
+  .requiredOption('-d, --build-definition <buildDefinition>', 'Build definition name or id')
+  .action(async ({ buildDefinition, project, branch }) => {
+    const ado = container.resolve(AzureDevopsService);
+    const conn = await ado.createConnection();
+    const builds = await conn.getBuildApi();
+    project = decodeURIComponent(project);
+    while (true) {
+      const build = await builds.getLatestBuild(project, buildDefinition, branch);
+      const logs = await builds.getBuildLogs(decodeURIComponent(project), build.id);
+      const lastLog = logs[logs.length - 1];
+      const lines = await builds.getBuildLogLines(project, build.id, lastLog.id);
+      console.clear();
+      lines.forEach((line) => console.log(line));
+      console.log(`${chalk.green(`In progress...`)} Completed ${logs.length}`);
+      await new Promise((resolve, reject) => setTimeout(resolve, 5000));
+    }
   });
 
 program.parse(process.argv);
