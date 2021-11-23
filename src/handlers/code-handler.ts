@@ -65,18 +65,19 @@ export class CodeHandler {
     }
 
     const { codePath, azureDevopsOrganization } = this.storageService.get();
+    const repoName = kebabCase(repo.name);
     const projectLocation = path.resolve(codePath, kebabCase(azureDevopsOrganization), kebabCase(project.name));
 
     fs.mkdirp(projectLocation).catch(() => {});
 
-    const repoLocation = path.resolve(projectLocation, kebabCase(repo.name));
+    const repoLocation = path.resolve(projectLocation, repoName);
 
     if (fs.existsSync(repoLocation)) {
     } else {
-      console.log(`Cloning using repo: ${repo.name} on project ${project.name} at location: ${projectLocation}`);
+      console.log(`Cloning using repo: ${repoName} on project ${project.name} at location: ${projectLocation}`);
 
       shell.cd(projectLocation);
-      shell.exec(`git clone ${repo.remoteUrl} ${repo.name.toLowerCase()}`);
+      shell.exec(`git clone ${repo.remoteUrl} ${repoName}`);
     }
 
     console.log(repoLocation);
