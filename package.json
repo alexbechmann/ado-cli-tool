@@ -1,6 +1,6 @@
 {
   "name": "@alexbechmann/ado-cli-tool",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Azure devops CLI tool",
   "main": "index.js",
   "scripts": {
