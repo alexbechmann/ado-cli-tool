@@ -17,7 +17,17 @@ export class CodeHandler {
     private storageService: StorageService
   ) {}
 
-  async code({ useSsh }: { useSsh?: boolean }) {
+  async code({
+    useSsh,
+    changeCodePath,
+  }: {
+    useSsh?: boolean;
+    changeCodePath: boolean;
+  }) {
+    console.log(`${chalk.blue("Use ssh:")} ${Boolean(useSsh)}`);
+    console.log(
+      `${chalk.blue("Change code location:")} ${Boolean(changeCodePath)}`
+    );
     const projects = await this.azureDevopsService.getProjects();
 
     const projectResponse = await inquirer.prompt([
@@ -58,7 +68,7 @@ export class CodeHandler {
 
       const repo: GitRepository = repoResponse.repo;
 
-      if (!this.storageService.get().codePath) {
+      if (!this.storageService.get().codePath || changeCodePath) {
         const { newCodePath } = await inquirer.prompt([
           {
             name: "newCodePath",

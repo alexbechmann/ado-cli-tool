@@ -12,10 +12,13 @@ const program = new Command();
 
 program
   .command("code")
-  .option("-ssh, --ssh", "Use ssh")
-  .action(({ ssh }) => {
+  .option("-s, --ssh", "Use ssh")
+  .option("-c, --change-code-path", "Change code path")
+  .action((args) => {
+    const { ssh, changeCodePath } = args;
+    console.log(args, ssh, changeCodePath);
     const codeHandler = container.resolve(CodeHandler);
-    codeHandler.code({ useSsh: ssh });
+    codeHandler.code({ useSsh: ssh, changeCodePath });
   });
 
 program
