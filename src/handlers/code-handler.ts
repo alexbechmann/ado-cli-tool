@@ -1,4 +1,4 @@
-import inquirer from "inquirer";
+import inquirer, { prompt } from "inquirer";
 import fs from "fs-extra";
 import path from "path";
 import shell from "shelljs";
@@ -8,6 +8,7 @@ import { StorageService } from "../common/storage-service";
 import { GitRepository } from "azure-devops-node-api/interfaces/TfvcInterfaces";
 import { TeamProjectReference } from "azure-devops-node-api/interfaces/CoreInterfaces";
 import kebabCase from "just-kebab-case";
+import chalk from "chalk";
 
 @injectable()
 export class CodeHandler {
@@ -16,7 +17,7 @@ export class CodeHandler {
     private storageService: StorageService
   ) {}
 
-  async code() {
+  async code({ useSsh }: { useSsh?: boolean }) {
     const projects = await this.azureDevopsService.getProjects();
 
     const projectResponse = await inquirer.prompt([
@@ -37,55 +38,95 @@ export class CodeHandler {
 
     const repos = await this.azureDevopsService.getRepos(project.id);
 
-    const repoResponse = await inquirer.prompt([
-      {
-        name: "repo",
-        message: `Select repo`,
-        type: "list",
-        choices: repos.map((repo) => {
-          return {
-            value: repo,
-            name: repo.name,
-          };
-        }),
-      },
-    ]);
-
-    const repo: GitRepository = repoResponse.repo;
-
-    if (!this.storageService.get().codePath) {
-      const { newCodePath } = await inquirer.prompt([
+    let done = false;
+    while (!done) {
+      const repoResponse = await inquirer.prompt([
         {
-          name: "newCodePath",
-          message: `What base path would you like to use to store your code`,
-          type: "input",
+          name: "repo",
+          message: `Select repo`,
+          type: "list",
+          choices: repos.map((repo) => {
+            return {
+              value: repo,
+              name: repo.name,
+            };
+          }),
         },
       ]);
-      this.storageService.set({ codePath: newCodePath });
-    }
 
-    const { codePath, azureDevopsOrganization } = this.storageService.get();
-    const projectLocation = path.resolve(
-      codePath,
-      kebabCase(azureDevopsOrganization),
-      kebabCase(project.name)
-    );
+      const repo: GitRepository = repoResponse.repo;
 
-    fs.mkdirp(projectLocation).catch(() => {});
+      if (!this.storageService.get().codePath) {
+        const { newCodePath } = await inquirer.prompt([
+          {
+            name: "newCodePath",
+            message: `What base path would you like to use to store your code`,
+            type: "input",
+          },
+        ]);
+        this.storageService.set({ codePath: newCodePath });
+      }
 
-    const repoLocation = path.resolve(projectLocation, kebabCase(repo.name));
-
-    if (fs.existsSync(repoLocation)) {
-    } else {
-      console.log(
-        `Cloning using repo: ${repo.name} on project ${project.name} at location: ${projectLocation}`
+      const { codePath, azureDevopsOrganization } = this.storageService.get();
+      const projectLocation = path.resolve(
+        codePath,
+        kebabCase(azureDevopsOrganization),
+        kebabCase(project.name)
       );
 
-      shell.cd(projectLocation);
-      shell.exec(`git clone ${repo.remoteUrl} ${repo.name.toLowerCase()}`);
-    }
+      fs.mkdirp(projectLocation).catch(() => {});
 
-    console.log(repoLocation);
-    shell.exec(`code ${repoLocation}`);
+      const repoLocation = path.resolve(projectLocation, kebabCase(repo.name));
+
+      if (fs.existsSync(repoLocation)) {
+      } else {
+        console.log(
+          `Cloning using repo: ${repo.name} on project ${project.name} at location: ${projectLocation}`
+        );
+
+        shell.cd(projectLocation);
+        const cloneUrl = useSsh ? repo.sshUrl : repo.remoteUrl;
+
+        shell.exec(`git clone ${cloneUrl} ${kebabCase(repo.name)}`);
+      }
+
+      console.log(`${chalk.green("Code location:")} ${repoLocation}`);
+
+      const { openIn } = await inquirer.prompt([
+        {
+          name: "openIn",
+          message: `What next?`,
+          type: "list",
+          choices: [
+            {
+              name: "Code",
+              value: "code",
+            },
+            {
+              name: `Another repo in ${project.name}`,
+              value: "anotherRepo",
+            },
+            {
+              name: "None",
+              value: "none",
+            },
+          ],
+        },
+      ]);
+
+      switch (openIn) {
+        case "code": {
+          shell.exec(`code ${repoLocation}`);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+
+      if (openIn !== "anotherRepo") {
+        done = true;
+      }
+    }
   }
 }

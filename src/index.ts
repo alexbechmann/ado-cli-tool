@@ -6,10 +6,13 @@ import { container } from "tsyringe";
 
 const program = new Command();
 
-program.command("code").action(() => {
-  const codeHandler = container.resolve(CodeHandler);
-  codeHandler.code();
-});
+program
+  .command("code")
+  .option("-ssh, --ssh", "Use ssh")
+  .action(({ ssh }) => {
+    const codeHandler = container.resolve(CodeHandler);
+    codeHandler.code({ useSsh: ssh });
+  });
 
 program
   .command("login")
