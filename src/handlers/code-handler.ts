@@ -24,8 +24,9 @@ export class CodeHandler {
       {
         name: "project",
         message: `Select project`,
-        type: "list",
+        type: "search-list",
         choices: projects.map((project) => {
+          project["toString"] = () => project.name;
           return {
             value: project,
             name: project.name,
@@ -44,8 +45,9 @@ export class CodeHandler {
         {
           name: "repo",
           message: `Select repo`,
-          type: "list",
+          type: "search-list",
           choices: repos.map((repo) => {
+            repo["toString"] = () => repo.name;
             return {
               value: repo,
               name: repo.name,
@@ -96,7 +98,7 @@ export class CodeHandler {
         {
           name: "openIn",
           message: `What next?`,
-          type: "list",
+          type: "search-list",
           choices: [
             {
               name: "Code",

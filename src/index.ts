@@ -3,6 +3,10 @@ import { CodeHandler } from "./handlers/code-handler";
 import { LoginHandler } from "./handlers/login-handler";
 import { GetTokenHandler } from "./handlers/get-token-handler";
 import { container } from "tsyringe";
+import inquirer from "inquirer";
+import inquirerList from "inquirer-search-list";
+
+inquirer.registerPrompt("search-list", inquirerList);
 
 const program = new Command();
 
