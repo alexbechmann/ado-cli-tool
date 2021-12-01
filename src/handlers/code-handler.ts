@@ -91,7 +91,6 @@ export class CodeHandler {
         console.log(
           `Cloning using repo: ${repo.name} on project ${project.name} at location: ${projectLocation}`
         );
-        console.log(projectLocation);
 
         shell.cd(projectLocation);
         const cloneUrl = useSsh ? repo.sshUrl : repo.remoteUrl;
