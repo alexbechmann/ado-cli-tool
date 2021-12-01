@@ -16,7 +16,6 @@ program
   .option("-c, --change-code-path", "Change code path")
   .action((args) => {
     const { ssh, changeCodePath } = args;
-    console.log(args, ssh, changeCodePath);
     const codeHandler = container.resolve(CodeHandler);
     codeHandler.code({ useSsh: ssh, changeCodePath });
   });

@@ -24,10 +24,6 @@ export class CodeHandler {
     useSsh?: boolean;
     changeCodePath: boolean;
   }) {
-    console.log(`${chalk.blue("Use ssh:")} ${Boolean(useSsh)}`);
-    console.log(
-      `${chalk.blue("Change code location:")} ${Boolean(changeCodePath)}`
-    );
     const projects = await this.azureDevopsService.getProjects();
 
     const projectResponse = await inquirer.prompt([
@@ -86,7 +82,7 @@ export class CodeHandler {
         kebabCase(project.name)
       );
 
-      fs.mkdirp(projectLocation).catch(() => {});
+      fs.mkdirpSync(projectLocation);
 
       const repoLocation = path.resolve(projectLocation, kebabCase(repo.name));
 
@@ -95,6 +91,7 @@ export class CodeHandler {
         console.log(
           `Cloning using repo: ${repo.name} on project ${project.name} at location: ${projectLocation}`
         );
+        console.log(projectLocation);
 
         shell.cd(projectLocation);
         const cloneUrl = useSsh ? repo.sshUrl : repo.remoteUrl;
