@@ -17,6 +17,10 @@ export class CodeHandler {
     private storageService: StorageService
   ) {}
 
+  private cleanupCasing(value: string) {
+    return kebabCase(value.toLowerCase());
+  }
+
   async code({
     useSsh,
     changeCodePath,
@@ -78,13 +82,16 @@ export class CodeHandler {
       const { codePath, azureDevopsOrganization } = this.storageService.get();
       const projectLocation = path.resolve(
         codePath,
-        kebabCase(azureDevopsOrganization),
-        kebabCase(project.name)
+        this.cleanupCasing(azureDevopsOrganization),
+        this.cleanupCasing(project.name)
       );
 
       fs.mkdirpSync(projectLocation);
 
-      const repoLocation = path.resolve(projectLocation, kebabCase(repo.name));
+      const repoLocation = path.resolve(
+        projectLocation,
+        this.cleanupCasing(repo.name)
+      );
 
       if (fs.existsSync(repoLocation)) {
       } else {
@@ -95,7 +102,7 @@ export class CodeHandler {
         shell.cd(projectLocation);
         const cloneUrl = useSsh ? repo.sshUrl : repo.remoteUrl;
 
-        shell.exec(`git clone ${cloneUrl} ${kebabCase(repo.name)}`);
+        shell.exec(`git clone ${cloneUrl} ${this.cleanupCasing(repo.name)}`);
       }
 
       console.log(`${chalk.green("Code location:")} ${repoLocation}`);

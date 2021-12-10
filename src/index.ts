@@ -5,6 +5,7 @@ import { GetTokenHandler } from "./handlers/get-token-handler";
 import { container } from "tsyringe";
 import inquirer from "inquirer";
 import inquirerList from "inquirer-search-list";
+import { AzureDevopsService } from "./common/azure-devops-service";
 
 inquirer.registerPrompt("search-list", inquirerList);
 
@@ -36,5 +37,16 @@ program
     const getTokenHandler = container.resolve(GetTokenHandler);
     getTokenHandler.logToken({ org });
   });
+
+program.command("gitflow").action(async () => {
+  const azureDevopsService = container.resolve(AzureDevopsService);
+  const connection = await azureDevopsService.createConnection();
+
+  const git = await connection.getGitApi();
+  const policy = await connection.getPolicyApi();
+  const project = "VELUX-IT-Dev";
+  const policyConfig = await policy.getPolicyConfigurations(project);
+  console.log({ policyConfig });
+});
 
 program.parse(process.argv);
